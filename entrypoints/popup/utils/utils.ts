@@ -98,3 +98,26 @@ export function formatNumberForDisplay(num: number, maxDecimals: number = 2): st
   
   return formatted;
 } 
+
+// Returns the color for a calculator operation symbol
+export function opColor(op: string): string {
+  switch (op) {
+    case "+":
+      return "#22c55e";
+    case "-":
+      return "#ef4444";
+    case "×":
+      return "#3b82f6";
+    case "÷":
+      return "#a21caf";
+    case "%":
+      return "#f59e42";
+    default:
+      return "#fff";
+  }
+}
+
+// Type guard for MotionValue<number>
+export function isMotionValue(val: any): val is import("motion/react").MotionValue<number> {
+  return val && typeof val.on === "function" && typeof val.get === "function";
+} 

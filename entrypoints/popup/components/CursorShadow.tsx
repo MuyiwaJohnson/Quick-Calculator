@@ -4,6 +4,8 @@ import {
   formatLargeNumber,
   isNumberTooLarge,
   getNumberFontSize,
+  opColor,
+  isMotionValue,
 } from "../utils/utils";
 import {
   exportToCSV,
@@ -12,6 +14,10 @@ import {
   formatHistoryForExport,
 } from "../utils/export";
 import type { CalculatorOperation } from "../types";
+import { CalculatorHeader } from "./CalculatorHeader";
+import { OperationBar } from "./OperationBar";
+import { HistoryList } from "./HistoryList";
+import { TotalDisplay } from "./TotalDisplay";
 
 interface Props {
   x: MotionValue<number>;
@@ -77,11 +83,6 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
           clearTimeout(timeoutId);
         };
       }, []);
-      function isMotionValue(val: any): val is MotionValue<number> {
-        return (
-          val && typeof val.on === "function" && typeof val.get === "function"
-        );
-      }
       useEffect(() => {
         if (!followCursor) return;
         if (!isMotionValue(x) || !isMotionValue(y)) {
@@ -143,8 +144,6 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
         [onOperation]
       );
 
-      const formattedTotal = useMemo(() => total.toLocaleString(), [total]);
-
       const totalFontSize = useMemo(() => {
         const abs = Math.abs(total);
         if (abs >= 1e12) return 16;
@@ -202,228 +201,32 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
             mass: 0.8,
           }}
         >
-          {/* Calculator Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-[9px] min-w-0">
-              {/* Draggable Icon */}
-              <span
-                title="Drag"
-                className="inline-flex items-center text-[18px] text-[#666] opacity-70 cursor-grab select-none flex-shrink-0"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="5" cy="5" r="1.2" fill="#888" />
-                  <circle cx="5" cy="9" r="1.2" fill="#888" />
-                  <circle cx="5" cy="13" r="1.2" fill="#888" />
-                  <circle cx="9" cy="5" r="1.2" fill="#888" />
-                  <circle cx="9" cy="9" r="1.2" fill="#888" />
-                  <circle cx="9" cy="13" r="1.2" fill="#888" />
-                </svg>
-              </span>
-              <span className="text-[15px] text-[#aaa] font-mono whitespace-nowrap overflow-hidden text-ellipsis">
-                CALCULATOR
-              </span>
-            </div>
-            {/* Actions: Export CSV, Copy, Close */}
-            <div className="flex items-center gap-[5px] flex-shrink-0">
-              {/* Export CSV Button */}
-              {history.length > 0 && (
-                <motion.button
-                  onClick={handleExportCSV}
-                  title="Export to CSV"
-                  className="bg-none border border-[#444] rounded-md text-[#aaa] w-[22.5px] h-[22.5px] cursor-pointer ml-0 flex items-center justify-center p-0"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <span role="img" aria-label="CSV">
-                    📄
-                  </span>
-                </motion.button>
-              )}
-              {/* Copy Total Button */}
-              <motion.button
-                onClick={handleCopyTotal}
-                title="Copy total"
-                className="bg-none border border-[#444] rounded-md text-[#aaa] w-[22.5px] h-[22.5px] cursor-pointer ml-0 flex items-center justify-center p-0"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span role="img" aria-label="Copy">
-                  ⧉
-                </span>
-              </motion.button>
-              {/* Remove/Close Button */}
-              {onRemove && (
-                <button
-                  onClick={onRemove}
-                  title="Close calculator"
-                  className="bg-none border-none text-[#aaa] text-[20.5px] cursor-pointer ml-[5px] p-0 flex items-center opacity-70 transition-opacity duration-150 hover:opacity-100"
-                  style={{ outline: "none" }}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <line
-                      x1="4"
-                      y1="4"
-                      x2="14"
-                      y2="14"
-                      stroke="#aaa"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <line
-                      x1="14"
-                      y1="4"
-                      x2="4"
-                      y2="14"
-                      stroke="#aaa"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Operation Buttons */}
-          <div className="flex gap-2 mb-[19px] mt-[13px]">
-            {operations.map((op) => (
-              <motion.button
-                key={op.symbol}
-                onClick={() =>
-                  handleOperationClick(op.symbol as CalculatorOperation)
-                }
-                className={`w-[22.5px] h-[22.5px] rounded-md font-semibold text-[13.5px] text-white border transition-all duration-150 cursor-pointer ${
-                  currentOperation === op.symbol
-                    ? "border-white shadow-md"
-                    : "border-[#444]"
-                } ${currentOperation === op.symbol ? "" : "bg-[#222]"}`}
-                style={{
-                  background:
-                    currentOperation === op.symbol ? op.color : undefined,
-                }}
-                title={op.label}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {op.symbol}
-              </motion.button>
-            ))}
-          </div>
-
-          {/* Numbers History */}
-          <div className="scrollbar-thin scrollbar-thumb-[#444] scrollbar-track-transparent mb-[13px] max-h-[81px] overflow-y-auto overflow-x-hidden">
-            {history.length === 0 ? (
-              <div className="text-[#8888] text-[13px] italic">
-                No numbers added yet
-              </div>
-            ) : (
-              history.map((item, index) => (
-                <motion.div
-                  key={index}
-                  className="flex justify-between items-center text-[14.5px] py-0.5"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <span className="text-[#bbb] font-mono">#{index + 1}</span>
-                  <span
-                    className="font-mono max-w-[121px] overflow-hidden text-ellipsis text-[15.5px]"
-                    style={{ color: opColor(item.operation) }}
-                    title={`${item.operation}${item.value.toLocaleString()}`}
-                  >
-                    {item.operation}
-                    {item.value.toLocaleString()}
-                  </span>
-                </motion.div>
-              ))
-            )}
-          </div>
-
-          {/* Divider Line */}
+          <CalculatorHeader
+            onExport={handleExportCSV}
+            onCopy={handleCopyTotal}
+            onRemove={onRemove}
+            hasHistory={history.length > 0}
+          />
+          <OperationBar
+            operations={operations}
+            currentOperation={currentOperation}
+            onOperationClick={handleOperationClick}
+          />
+          <HistoryList history={history} />
           <div className="border-t border-[#444] mb-[13px]"></div>
-
-          {/* Total Result */}
-          <div className="flex flex-row items-center justify-between py-[9px] gap-[9px] w-full text-[16.5px]">
-            <span className="text-[#aaa] text-[16.5px] font-medium whitespace-nowrap flex-shrink-0">
-              TOTAL
-            </span>
-            <motion.span
-              className="font-bold font-mono text-white break-all overflow-x-auto text-right px-[5px] max-w-[181px]"
-              style={{ fontSize: totalFontSize + 1.5 }}
-              initial={{ scale: 1.2, color: "#10b981" }}
-              animate={{ scale: 1, color: "#ffffff" }}
-              transition={{ type: "spring", stiffness: 400, damping: 15 }}
-              title={
-                isTotalTooLarge
-                  ? `${total.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })} (exp: ${total.toExponential(2)})`
-                  : `${total.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}`
-              }
-            >
-              {total.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </motion.span>
-          </div>
-
-          {/* Item Count */}
-          <div className="text-[#888] text-[13.5px] mt-[9px] text-center">
-            {history.length} item{history.length !== 1 ? "s" : ""} added
-          </div>
+          <TotalDisplay
+            total={total}
+            totalFontSize={totalFontSize}
+            isTotalTooLarge={isTotalTooLarge}
+          />
           {/* Shortcut Tip Footer */}
           {history.length === 0 && (
-            <div className="text-[#aaa] text-[12.5px] text-center opacity-70 mt-[19px] mb-1 flex flex-row items-center justify-center gap-[5px]">
-              <kbd className="bg-[#222] text-[#eee] rounded px-[7px] py-[3px] text-[11.5px] font-inherit border border-[#444] mr-[3px] shadow-sm">
-                Ctrl
-              </kbd>
-              <span className="text-[11.5px] text-[#888]">+</span>
-              <kbd className="bg-[#222] text-[#eee] rounded px-[7px] py-[3px] text-[11.5px] font-inherit border border-[#444] mr-[3px] shadow-sm">
-                Shift
-              </kbd>
-              <span className="text-[11.5px] text-[#888]">+</span>
-              <kbd className="bg-[#222] text-[#eee] rounded px-[7px] py-[3px] text-[11.5px] font-inherit border border-[#444] shadow-sm">
-                C
-              </kbd>
-              <span className="text-[11.5px] text-[#888] ml-[5px]">
-                to open
-              </span>
+            <div className="text-[#10b981] text-[13px] text-center opacity-80 mt-[19px] mb-1 flex flex-row items-center justify-center gap-2 select-none">
+              <span role="img" aria-label="sparkles">✨</span>
+              <span className="font-mono">Double-click a number!</span>
             </div>
           )}
         </motion.div>
       );
     }
   );
-function opColor(op: string) {
-  switch (op) {
-    case "+":
-      return "#22c55e";
-    case "-":
-      return "#ef4444";
-    case "×":
-      return "#3b82f6";
-    case "÷":
-      return "#a21caf";
-    case "%":
-      return "#f59e42";
-    default:
-      return "#fff";
-  }
-}
