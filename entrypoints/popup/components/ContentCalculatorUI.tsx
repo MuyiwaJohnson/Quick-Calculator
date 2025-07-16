@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {  useEffect, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { X, Move, Minimize2, Maximize2, MousePointer, Calculator } from 'lucide-react';
 import { useCalculator } from '../hooks/use-calculator';
 import { useKeyboardShortcuts } from '../hooks/use-keyboard-shortcuts';
 import { useToast, ToastContainer } from '../hooks/use-toast';
@@ -18,11 +17,9 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
   onClose,
   onRemove,
 }) => {
-  const [isMinimized, setIsMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [followMouse, setFollowMouse] = useState(false);
   const [mousePosition, setMousePosition] = useState(initialPosition);
-  const constraintsRef = React.useRef(null);
 
   // Calculator state
   const {
@@ -34,7 +31,6 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
     reset,
     undo,
     show,
-    hide,
     copyTotal,
     exportToCSV,
     exportToJSON,

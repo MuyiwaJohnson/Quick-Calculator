@@ -1,3 +1,17 @@
+// CursorShadow.tsx
+// Main calculator popup component. Handles position, animation, and renders all calculator UI (header, operations, history, total, footer tip).
+// Props:
+// - x, y: Motion values for position
+// - total: Current total
+// - history: List of operations
+// - isVisible: Whether the calculator is visible
+// - onOperation: Callback for operation changes
+// - currentOperation: Current operation symbol
+// - onCopy: Callback to copy total
+// - followCursor: Whether to follow the mouse
+// - onRemove: Remove/close the calculator
+// - onReset: Reset the calculator
+
 import { motion, MotionValue } from "motion/react";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
@@ -19,6 +33,22 @@ import { OperationBar } from "./OperationBar";
 import { HistoryList } from "./HistoryList";
 import { TotalDisplay } from "./TotalDisplay";
 
+/**
+ * CursorShadow
+ * Main calculator popup. Handles position, animation, and renders all calculator UI.
+ * @param {Object} props
+ * @param {MotionValue<number>} props.x - X position
+ * @param {MotionValue<number>} props.y - Y position
+ * @param {number} props.total - Current total
+ * @param {Array} props.history - List of operations
+ * @param {boolean} props.isVisible - Whether the calculator is visible
+ * @param {function} [props.onOperation] - Callback for operation changes
+ * @param {string} [props.currentOperation] - Current operation symbol
+ * @param {function} [props.onCopy] - Callback to copy total
+ * @param {boolean} [props.followCursor] - Whether to follow the mouse
+ * @param {function} [props.onRemove] - Remove/close the calculator
+ * @param {function} [props.onReset] - Reset the calculator
+ */
 interface Props {
   x: MotionValue<number>;
   y: MotionValue<number>;
@@ -29,6 +59,7 @@ interface Props {
   currentOperation?: CalculatorOperation;
   onCopy?: (text: string) => void;
   followCursor?: boolean;
+  onRemove?: () => void;
   onReset?: () => void;
 }
 
