@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react';
+import type { CalculatorConfig, CalculatorHistory, CalculatorOperation, UseCalculatorReturn } from '../types';
 
 interface KeyboardShortcutsProps {
   onEscape: () => void;
@@ -7,7 +8,7 @@ interface KeyboardShortcutsProps {
   isEnabled: boolean;
   showToast: (message: string, type: 'success' | 'info' | 'warning') => void;
   onShortcutPress: (shortcut: string) => void;
-  onOperationChange: (operation: string) => void;
+  onOperationChange: (operation: CalculatorOperation) => void;
   onCopyTotal: () => void;
   onShowCalculator: () => void;
   onExportCSV: () => void;

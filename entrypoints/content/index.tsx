@@ -1,7 +1,7 @@
 // content.js
 import ReactDOM from "react-dom/client";
 import { createShadowRootUi } from "#imports";
-import FloatingUI from "./FloatingUI.tsx";
+import ContentCalculatorUI from "./ContentCalculatorUI.tsx";
 import "../popup/style.css";
 
 export default defineContentScript({
@@ -50,7 +50,7 @@ export default defineContentScript({
         // Render FloatingUI directly as the root
         const root = ReactDOM.createRoot(container);
         root.render(
-          <FloatingUI 
+          <ContentCalculatorUI 
             initialPosition={mousePosition}
             onClose={() => {
               uiMounted = false;
