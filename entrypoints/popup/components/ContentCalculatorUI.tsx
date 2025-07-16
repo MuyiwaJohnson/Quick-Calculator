@@ -153,6 +153,7 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
           onCopy={copyTotal}
           followCursor={followMouse}
           onRemove={onRemove}
+          onReset={reset}
         />
       </motion.div>
       <ToastContainer toasts={toasts} onRemove={removeToast} />

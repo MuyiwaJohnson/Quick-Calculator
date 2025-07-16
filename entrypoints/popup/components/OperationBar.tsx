@@ -13,7 +13,7 @@ export const OperationBar: React.FC<OperationBarProps> = ({
   currentOperation,
   onOperationClick,
 }) => (
-  <div className="flex gap-2 mb-[19px] mt-[10px]">
+  <div className="flex gap-2 mb-[19px] mt-[14px]">
     {operations.map((op) => (
       <OperationButton
         key={op.symbol}

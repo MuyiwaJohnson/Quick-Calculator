@@ -1,15 +1,16 @@
 import React from "react";
 import { IconButton } from "./IconButton";
+import { Copy, Trash2, X } from "lucide-react";
 
 interface CalculatorHeaderProps {
-  onExport: () => void;
+  onReset: () => void;
   onCopy: () => void;
   onRemove?: () => void;
   hasHistory: boolean;
 }
 
 export const CalculatorHeader: React.FC<CalculatorHeaderProps> = ({
-  onExport,
+  onReset,
   onCopy,
   onRemove,
   hasHistory,
@@ -40,43 +41,18 @@ export const CalculatorHeader: React.FC<CalculatorHeaderProps> = ({
         CALCULATOR
       </span>
     </div>
-    <div className="flex items-center gap-[5px] flex-shrink-0">
+    <div className="flex items-center gap-[10px] flex-shrink-0">
       {hasHistory && (
-        <IconButton onClick={onExport} title="Export to CSV">
-          <span role="img" aria-label="CSV">📄</span>
+        <IconButton onClick={onReset} title="Reset" color="red">
+          <Trash2 size={13} color="#ef4444" />
         </IconButton>
       )}
       <IconButton onClick={onCopy} title="Copy total">
-        <span role="img" aria-label="Copy">⧉</span>
+        <Copy size={13} />
       </IconButton>
       {onRemove && (
         <IconButton onClick={onRemove} title="Close calculator" size="large">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <line
-              x1="4"
-              y1="4"
-              x2="14"
-              y2="14"
-              stroke="#aaa"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <line
-              x1="14"
-              y1="4"
-              x2="4"
-              y2="14"
-              stroke="#aaa"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <X size={13} color="#aaa" />
         </IconButton>
       )}
     </div>

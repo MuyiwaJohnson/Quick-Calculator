@@ -29,6 +29,7 @@ interface Props {
   currentOperation?: CalculatorOperation;
   onCopy?: (text: string) => void;
   followCursor?: boolean;
+  onReset?: () => void;
 }
 
 export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
@@ -44,6 +45,7 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
       onCopy,
       followCursor = true,
       onRemove,
+      onReset,
     }) => {
       const [position, setPosition] = useState({
         top: 0,
@@ -129,13 +131,9 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
         onCopy?.(text);
       }, [total, onCopy]);
 
-      const handleExportCSV = useCallback(() => {
-        if (history.length === 0) return;
-        const exportData = formatHistoryForExport(history, total, "");
-        const csvContent = exportToCSV(exportData);
-        const filename = generateFilename("calculator_history", "csv");
-        downloadFile(csvContent, filename, "text/csv");
-      }, [history, total]);
+      const handleReset = useCallback(() => {
+        if (typeof onReset === 'function') onReset();
+      }, [onReset]);
 
       const handleOperationClick = useCallback(
         (symbol: CalculatorOperation) => {
@@ -171,7 +169,7 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
       return (
         <motion.div
           style={fixedStyle}
-          className="min-w-[288px] max-w-[360px] min-h-[276px] max-h-[346px] bg-[rgba(20,20,20,0.98)] text-white rounded-2xl shadow-2xl p-6 border border-[#444] backdrop-blur-md z-[9999]"
+          className="min-w-[288px] max-w-[360px] min-h-[276px] max-h-[346px] bg-[rgba(20,20,20,0.98)] text-white rounded-2xl shadow-2xl p-6 pt-3 border border-[#444] backdrop-blur-md z-[9999]"
           initial={{
             opacity: 0,
             scale: 0.8,
@@ -202,7 +200,7 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
           }}
         >
           <CalculatorHeader
-            onExport={handleExportCSV}
+            onReset={handleReset}
             onCopy={handleCopyTotal}
             onRemove={onRemove}
             hasHistory={history.length > 0}
