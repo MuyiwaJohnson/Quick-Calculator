@@ -114,22 +114,6 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
     onToggleFollowCursor: () => setFollowMouse(f => !f),
   });
 
-  const handleDragStart = () => {
-    setIsDragging(true);
-    setFollowMouse(false);
-  };
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-  const toggleFollowMouse = () => {
-    setFollowMouse(f => {
-      if (!f) {
-        x.set(mousePosition.x + 20);
-        y.set(mousePosition.y + 20);
-      }
-      return !f;
-    });
-  };
 
   return (
     <>
