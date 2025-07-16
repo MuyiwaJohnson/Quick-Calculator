@@ -1,9 +1,9 @@
 import { defineConfig } from 'wxt';
 
+
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
-
     name: 'Cursor Simple Calc',
     description: 'A simple, animated calculator extension with cursor shadow and context menu integration.',
     permissions: ['clipboardWrite', 'contextMenus', 'storage'],

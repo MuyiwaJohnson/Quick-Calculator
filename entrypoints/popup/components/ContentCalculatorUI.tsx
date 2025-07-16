@@ -1,20 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { X, Move, Minimize2, Maximize2, MousePointer, Calculator } from 'lucide-react';
-import { useCalculator } from '../popup/hooks/use-calculator';
-import { useKeyboardShortcuts } from '../popup/hooks/use-keyboard-shortcuts';
-import { useToast, ToastContainer } from '../popup/hooks/use-toast';
-import type { CalculatorOperation } from '../popup/types';
+import { useCalculator } from '../hooks/use-calculator';
+import { useKeyboardShortcuts } from '../hooks/use-keyboard-shortcuts';
+import { useToast, ToastContainer } from '../hooks/use-toast';
+import type { CalculatorOperation } from '../types';
 import { CursorShadow } from './CursorShadow';
 
 interface ContentCalculatorUIProps {
   initialPosition?: { x: number; y: number };
   onClose: () => void;
+  onRemove?: () => void;
 }
 
 const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
   initialPosition = { x: 100, y: 100 },
   onClose,
+  onRemove,
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -135,17 +137,24 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
 
   return (
     <>
-      <CursorShadow
-        x={followMouse ? springX : x}
-        y={followMouse ? springY : y}
-        total={total}
-        history={history}
-        isVisible={true}
-        onOperation={setOperation}
-        currentOperation={currentOperation}
-        onCopy={copyTotal}
-        followCursor={followMouse}
-      />
+      <motion.div
+        drag={!followMouse}
+        dragMomentum={false}
+        style={{ x, y, position: 'fixed', zIndex: 10000 }}
+      >
+        <CursorShadow
+          x={followMouse ? springX : x}
+          y={followMouse ? springY : y}
+          total={total}
+          history={history}
+          isVisible={true}
+          onOperation={setOperation}
+          currentOperation={currentOperation}
+          onCopy={copyTotal}
+          followCursor={followMouse}
+          onRemove={onRemove}
+        />
+      </motion.div>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );

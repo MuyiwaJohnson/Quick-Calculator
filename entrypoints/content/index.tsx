@@ -1,11 +1,12 @@
 // content.js
 import ReactDOM from "react-dom/client";
 import { createShadowRootUi } from "#imports";
-import ContentCalculatorUI from "./ContentCalculatorUI.tsx";
+import ContentCalculatorUI from "../popup/components/ContentCalculatorUI.tsx";
 import "../popup/style.css";
 
 export default defineContentScript({
   matches: ["*://*/*"],
+  cssInjectionMode: "ui",
   async main(ctx) {
     console.log("Floating UI content script loaded");
     
@@ -45,9 +46,8 @@ export default defineContentScript({
     // Create shadow root UI
     ui = await createShadowRootUi(ctx, {
       name: "floating-calculator-ui",
-      position: "overlay", // Use overlay for floating UI
+      position: "overlay",
       onMount: (container) => {
-        // Render FloatingUI directly as the root
         const root = ReactDOM.createRoot(container);
         root.render(
           <ContentCalculatorUI 
@@ -56,6 +56,7 @@ export default defineContentScript({
               uiMounted = false;
               ui.remove();
             }}
+            onRemove={ui.remove}
           />
         );
         uiMounted = true;
