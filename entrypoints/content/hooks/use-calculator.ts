@@ -7,7 +7,7 @@ import {
   generateFilename, 
   formatHistoryForExport 
 } from '../utils/export';
-import type { CalculatorConfig, CalculatorHistory, CalculatorOperation, UseCalculatorReturn } from '../types';
+import type { CalculatorConfig, CalculatorHistory, CalculatorOperation, UseCalculatorReturn } from '../../../types';
 
 export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorReturn => {
   const [total, setTotal] = useState(0);

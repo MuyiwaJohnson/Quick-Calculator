@@ -3,7 +3,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { useCalculator } from '../hooks/use-calculator';
 import { useKeyboardShortcuts } from '../hooks/use-keyboard-shortcuts';
 import { useToast, ToastContainer } from '../hooks/use-toast';
-import type { CalculatorOperation } from '../types';
+import type { CalculatorOperation } from '../../../types';
 import { CursorShadow } from './CursorShadow';
 
 interface ContentCalculatorUIProps {

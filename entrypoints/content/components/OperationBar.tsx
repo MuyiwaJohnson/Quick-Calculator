@@ -1,6 +1,6 @@
 import React from "react";
 import { OperationButton } from "./OperationButton";
-import type { CalculatorOperation } from "../types";
+import type { CalculatorOperation } from "../../../types";
 
 interface OperationBarProps {
   operations: Array<{ symbol: string; label: string; color: string }>;

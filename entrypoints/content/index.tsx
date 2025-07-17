@@ -1,7 +1,7 @@
 // content.js
 import ReactDOM from "react-dom/client";
 import { createShadowRootUi } from "#imports";
-import ContentCalculatorUI from "../popup/components/ContentCalculatorUI.tsx";
+import ContentCalculatorUI from "./components/ContentCalculatorUI.tsx";
 import "../popup/style.css";
 
 export default defineContentScript({

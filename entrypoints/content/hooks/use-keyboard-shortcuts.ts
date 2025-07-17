@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import type { CalculatorConfig, CalculatorHistory, CalculatorOperation, UseCalculatorReturn } from '../types';
+import type { CalculatorConfig, CalculatorHistory, CalculatorOperation, UseCalculatorReturn } from '../../../types';
 
 interface KeyboardShortcutsProps {
   onEscape: () => void;

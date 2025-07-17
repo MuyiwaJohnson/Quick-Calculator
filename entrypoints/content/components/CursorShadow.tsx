@@ -14,20 +14,9 @@
 
 import { motion, MotionValue } from "motion/react";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import {
-  formatLargeNumber,
-  isNumberTooLarge,
-  getNumberFontSize,
-  opColor,
-  isMotionValue,
-} from "../utils/utils";
-import {
-  exportToCSV,
-  downloadFile,
-  generateFilename,
-  formatHistoryForExport,
-} from "../utils/export";
-import type { CalculatorOperation } from "../types";
+import { isNumberTooLarge, isMotionValue } from "../utils/utils";
+
+import type { CalculatorOperation } from "../../../types";
 import { CalculatorHeader } from "./CalculatorHeader";
 import { OperationBar } from "./OperationBar";
 import { HistoryList } from "./HistoryList";
@@ -163,7 +152,7 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
       }, [total, onCopy]);
 
       const handleReset = useCallback(() => {
-        if (typeof onReset === 'function') onReset();
+        if (typeof onReset === "function") onReset();
       }, [onReset]);
 
       const handleOperationClick = useCallback(
@@ -251,7 +240,9 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
           {/* Shortcut Tip Footer */}
           {history.length === 0 && (
             <div className="text-[#10b981] text-[13px] text-center opacity-80 mt-[19px] mb-1 flex flex-row items-center justify-center gap-2 select-none">
-              <span role="img" aria-label="sparkles">✨</span>
+              <span role="img" aria-label="sparkles">
+                ✨
+              </span>
               <span className="font-mono">Double-click a number!</span>
             </div>
           )}
