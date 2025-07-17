@@ -1,14 +1,14 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { checkOverflow } from '../utils/performance';
-import { 
-  exportToCSV as exportToCSVUtil, 
-  exportToJSON as exportToJSONUtil, 
-  downloadFile, 
-  generateFilename, 
-  formatHistoryForExport 
-} from '../utils/export';
 import type { CalculatorConfig, CalculatorHistory, CalculatorOperation, UseCalculatorReturn } from '../../../types';
 
+/**
+ * Custom React hook for calculator logic and state management.
+ * Handles total, history, operations, undo, reset, and clipboard copy.
+ *
+ * @param {CalculatorConfig} config - Optional configuration for the calculator.
+ * @returns {UseCalculatorReturn} Calculator state and actions.
+ */
 export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorReturn => {
   const [total, setTotal] = useState(0);
   const [history, setHistory] = useState<CalculatorHistory[]>([]);
@@ -17,29 +17,21 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
     config.defaultOperation || '+'
   );
 
-  // Memoize operation label mapping
-  const operationLabels = useMemo(() => ({
-    "+": "added",
-    "-": "subtracted", 
-    "×": "multiplied by",
-    "÷": "divided by",
-    "%": "percentage of"
-  }), []);
-
-  const getOperationLabel = useCallback((operation: string): string => {
-    return operationLabels[operation as keyof typeof operationLabels] || "added";
-  }, [operationLabels]);
-
-  // Calculate result with overflow checking
+  /**
+   * Calculates the result of applying an operation to the current total and a new value.
+   * Throws if overflow or invalid operation occurs.
+   * @param {CalculatorOperation} operation
+   * @param {number} currentTotal
+   * @param {number} newValue
+   * @returns {number}
+   */
   const calculateResult = useCallback((operation: CalculatorOperation, currentTotal: number, newValue: number): number => {
     if (config.enableOverflowCheck !== false) {
       if (checkOverflow(currentTotal, newValue, operation)) {
         throw new Error("Result too large! Consider using smaller numbers.");
       }
     }
-
     let result: number;
-    
     switch (operation) {
       case "+":
         result = currentTotal + newValue;
@@ -62,26 +54,26 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
       default:
         result = currentTotal + newValue;
     }
-
     if (!isFinite(result)) {
       throw new Error("Calculation resulted in infinity or NaN!");
     }
-
     return result;
   }, [config.enableOverflowCheck]);
 
-  // Add a number to the calculator
+  /**
+   * Adds a number to the calculator using the current operation.
+   * Updates total and history.
+   * @param {number} value
+   */
   const addNumber = useCallback((value: number) => {
     try {
       const newTotal = calculateResult(currentOperation, total, value);
       setTotal(newTotal);
-      
       const newHistoryItem: CalculatorHistory = {
         value,
         operation: currentOperation,
         timestamp: Date.now()
       };
-      
       setHistory(prev => {
         const newHistory = [...prev, newHistoryItem];
         // Limit history length if configured
@@ -90,21 +82,24 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
         }
         return newHistory;
       });
-      
       setIsCalculatorVisible(true);
     } catch (error) {
       console.error('Calculator error:', error);
-      // Error handling should be done by the calling component
       throw error;
     }
   }, [calculateResult, currentOperation, total, config.maxHistoryLength]);
 
-  // Set the current operation
+  /**
+   * Sets the current operation for the calculator.
+   * @param {CalculatorOperation} operation
+   */
   const setOperation = useCallback((operation: CalculatorOperation) => {
     setCurrentOperation(operation);
   }, []);
 
-  // Reset the calculator
+  /**
+   * Resets the calculator to its initial state.
+   */
   const reset = useCallback(() => {
     setTotal(0);
     setHistory([]);
@@ -112,11 +107,12 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
     setCurrentOperation(config.defaultOperation || '+');
   }, [config.defaultOperation]);
 
-  // Undo the last operation
+  /**
+   * Undoes the last operation in the history.
+   */
   const undo = useCallback(() => {
     if (history.length > 0) {
       const lastItem = history[history.length - 1];
-      
       let newTotal = total;
       switch (lastItem.operation) {
         case "+":
@@ -135,32 +131,22 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
           newTotal = total / (lastItem.value / 100);
           break;
       }
-      
       setTotal(newTotal);
       setHistory(prev => prev.slice(0, -1));
-      
       if (history.length === 1) {
         setIsCalculatorVisible(false);
       }
     }
   }, [history, total]);
 
-  // Show/hide calculator
-  const show = useCallback(() => {
-    setIsCalculatorVisible(true);
-  }, []);
-
-  const hide = useCallback(() => {
-    setIsCalculatorVisible(false);
-  }, []);
-
-  // Copy total to clipboard
+  /**
+   * Copies the total to the clipboard, formatted as currency.
+   */
   const copyTotal = useCallback(async () => {
     const formattedTotal = new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: config.currency === '₦' ? 'NGN' : 'USD'
     }).format(total);
-    
     try {
       await navigator.clipboard.writeText(formattedTotal);
     } catch (err) {
@@ -174,29 +160,6 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
     }
   }, [total, config.currency]);
 
-  // Export functions
-  const exportToCSV = useCallback(() => {
-    if (history.length === 0) {
-      throw new Error("No history to export");
-    }
-    
-    const exportData = formatHistoryForExport(history, total, config.currency || '₦');
-    const csvContent = exportToCSVUtil(exportData);
-    const filename = generateFilename('calculator_history', 'csv');
-    downloadFile(csvContent, filename, 'text/csv');
-  }, [history, total, config.currency]);
-
-  const exportToJSON = useCallback(() => {
-    if (history.length === 0) {
-      throw new Error("No history to export");
-    }
-    
-    const exportData = formatHistoryForExport(history, total, config.currency || '₦');
-    const jsonContent = exportToJSONUtil(exportData);
-    const filename = generateFilename('calculator_history', 'json');
-    downloadFile(jsonContent, filename, 'application/json');
-  }, [history, total, config.currency]);
-
   return {
     total,
     history,
@@ -206,10 +169,6 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
     setOperation,
     reset,
     undo,
-    show,
-    hide,
     copyTotal,
-    exportToCSV,
-    exportToJSON,
   };
 }; 

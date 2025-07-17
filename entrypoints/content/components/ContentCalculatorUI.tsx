@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useCalculator } from "../hooks/use-calculator";
-import { useKeyboardShortcuts } from "../hooks/use-keyboard-shortcuts";
 import { useToast, ToastContainer } from "../hooks/use-toast";
+import { useKeyboardShortcuts } from "../hooks/use-keyboard-shortcuts";
 import type { CalculatorOperation } from "../../../types";
 import { CursorShadow } from "./CursorShadow";
 
@@ -31,10 +31,8 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
     setOperation,
     reset,
     undo,
-    show,
     copyTotal,
-    exportToCSV,
-    exportToJSON,
+    isCalculatorVisible,
   } = useCalculator();
 
   const { toasts, showToast, removeToast } = useToast();
@@ -101,18 +99,9 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
 
   // Keyboard shortcuts (only when visible)
   useKeyboardShortcuts({
-    onEscape: onClose,
     onUndo: undo,
     onReset: reset,
-    isEnabled: true,
-    showToast,
-    onShortcutPress: (shortcut) => {},
-    onOperationChange: (op) => setOperation(op as CalculatorOperation),
-    onCopyTotal: copyTotal,
-    onShowCalculator: show,
-    onExportCSV: exportToCSV,
-    onExportJSON: exportToJSON,
-    onToggleFollowCursor: () => setFollowMouse((f) => !f),
+    isEnabled: isCalculatorVisible,
   });
 
   return (

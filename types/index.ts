@@ -36,11 +36,7 @@ export interface UseCalculatorReturn {
   setOperation: (operation: CalculatorOperation) => void;
   reset: () => void;
   undo: () => void;
-  show: () => void;
-  hide: () => void;
   copyTotal: () => Promise<void>;
-  exportToCSV: () => void;
-  exportToJSON: () => void;
 }
 
 // For use-cursor-pos, adapt as needed for your implementation

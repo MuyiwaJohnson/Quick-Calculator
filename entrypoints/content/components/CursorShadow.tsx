@@ -170,8 +170,7 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
       }, [total]);
 
       const isTotalTooLarge = useMemo(() => isNumberTooLarge(total), [total]);
-      if (!isVisible) return null;
-
+      // No show/hide logic should be present. Only rely on isVisible prop for rendering.
       const fixedStyle = followCursor
         ? {
             top: position.top,

@@ -1,6 +1,8 @@
-// Performance optimization utilities ported from cursor-mate
 
-// Simple memoization cache
+/**
+ * Simple memoization cache for storing key-value pairs with a maximum size.
+ * Oldest entries are evicted when the cache exceeds maxSize.
+ */
 export class MemoCache<K, V> {
   private cache = new Map<K, V>();
   private maxSize: number;
@@ -9,13 +11,18 @@ export class MemoCache<K, V> {
     this.maxSize = maxSize;
   }
 
+  /**
+   * Retrieve a value from the cache by key.
+   */
   get(key: K): V | undefined {
     return this.cache.get(key);
   }
 
+  /**
+   * Set a value in the cache. Evicts oldest if over maxSize.
+   */
   set(key: K, value: V): void {
     if (this.cache.size >= this.maxSize) {
-      // Remove oldest entry (first key)
       const firstKey = this.cache.keys().next().value;
       if (firstKey !== undefined) {
         this.cache.delete(firstKey);
@@ -24,16 +31,25 @@ export class MemoCache<K, V> {
     this.cache.set(key, value);
   }
 
+  /**
+   * Clear all entries from the cache.
+   */
   clear(): void {
     this.cache.clear();
   }
 
+  /**
+   * Check if a key exists in the cache.
+   */
   has(key: K): boolean {
     return this.cache.has(key);
   }
 }
 
-// Check for mathematical overflow
+/**
+ * Check for mathematical overflow for basic operations.
+ * Returns true if the operation would exceed JS safe integer limits.
+ */
 export function checkOverflow(a: number, b: number, operation: string): boolean {
   switch (operation) {
     case "×":
@@ -46,7 +62,10 @@ export function checkOverflow(a: number, b: number, operation: string): boolean 
   }
 }
 
-// Throttle function for performance
+/**
+ * Throttle a function so it only runs once per delay period.
+ * Useful for limiting rapid-fire events like scroll or resize.
+ */
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
   delay: number
@@ -56,7 +75,6 @@ export function throttle<T extends (...args: any[]) => any>(
 
   return (...args: Parameters<T>) => {
     const currentTime = Date.now();
-
     if (currentTime - lastExecTime > delay) {
       func(...args);
       lastExecTime = currentTime;
@@ -70,13 +88,15 @@ export function throttle<T extends (...args: any[]) => any>(
   };
 }
 
-// Debounce function for performance
+/**
+ * Debounce a function so it only runs after a delay since the last call.
+ * Useful for input or resize events.
+ */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   delay: number
 ): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout | null = null;
-
   return (...args: Parameters<T>) => {
     if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
@@ -86,13 +106,16 @@ export function debounce<T extends (...args: any[]) => any>(
 // Number formatting cache
 const numberFormatCache = new MemoCache<string, string>();
 
+/**
+ * Format a number as a currency string, using a cache for performance.
+ * @param num The number to format
+ * @param currency The currency symbol (default: '₦')
+ */
 export function cachedFormatNumber(num: number, currency: string = "₦"): string {
   const key = `${num}-${currency}`;
-  
   if (numberFormatCache.has(key)) {
     return numberFormatCache.get(key)!;
   }
-  
   const formatted = `${currency}${num.toLocaleString()}`;
   numberFormatCache.set(key, formatted);
   return formatted;
@@ -101,11 +124,14 @@ export function cachedFormatNumber(num: number, currency: string = "₦"): strin
 // Operation color cache
 const operationColorCache = new MemoCache<string, string>();
 
+/**
+ * Get a cached color class for a calculator operation symbol.
+ * @param operation The operation symbol ('+', '-', '×', '÷')
+ */
 export function getCachedOperationColor(operation: string): string {
   if (operationColorCache.has(operation)) {
     return operationColorCache.get(operation)!;
   }
-  
   let color: string;
   switch (operation) {
     case "+": color = "text-green-400"; break;
@@ -114,26 +140,33 @@ export function getCachedOperationColor(operation: string): string {
     case "÷": color = "text-purple-400"; break;
     default: color = "text-green-400";
   }
-  
   operationColorCache.set(operation, color);
   return color;
 }
 
-// Batch DOM updates
+/**
+ * Batch multiple DOM updates into a single animation frame for performance.
+ * @param updates Array of functions to run
+ */
 export function batchDOMUpdates(updates: (() => void)[]): void {
-  // Use requestAnimationFrame to batch updates
   requestAnimationFrame(() => {
     updates.forEach(update => update());
   });
 }
 
-// Optimize scroll performance
+/**
+ * Optimize scroll performance for an element by enabling hardware acceleration.
+ * @param element The HTML element to optimize
+ */
 export function optimizeScroll(element: HTMLElement): void {
   element.style.willChange = 'scroll-position';
-  element.style.transform = 'translateZ(0)'; // Force hardware acceleration
+  element.style.transform = 'translateZ(0)';
 }
 
-// Clean up optimization
+/**
+ * Clean up scroll optimization styles on an element.
+ * @param element The HTML element to clean up
+ */
 export function cleanupOptimization(element: HTMLElement): void {
   element.style.willChange = 'auto';
   element.style.transform = '';
