@@ -22,71 +22,43 @@ export default defineContentScript({
       }
     );
 
-    // Listen for messages to mount the UI
-    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.type === "MOUNT_UI" && !uiMounted) {
-        (async () => {
-          ui = await createShadowRootUi(ctx, {
-            name: "floating-calculator-ui",
-            position: "overlay",
-            onMount: (container) => {
-              const wrapper = document.createElement("div");
-              container.append(wrapper);
-              const root = ReactDOM.createRoot(wrapper);
-              root.render(
-                <ContentCalculatorUI
-                  onClose={() => {
-                    uiMounted = false;
-                    ui.remove();
-                  }}
-                  onRemove={ui.remove}
-                />
-              );
-              uiMounted = true;
-              return { root };
-            },
-            onRemove: (elements) => {
-              uiMounted = false;
-              elements?.root.unmount();
-            },
-          });
-          ui.mount();
-        })();
-        sendResponse({ message: "MOUNT_UI message received!" });
-      }
-    });
+    // Shared UI mounting logic
+    const mountCalculatorUI = async () => {
+      if (uiMounted) return;
+      ui = await createShadowRootUi(ctx, {
+        name: "floating-calculator-ui",
+        position: "overlay",
+        onMount: (container) => {
+          const wrapper = document.createElement("div");
+          container.append(wrapper);
+          const root = ReactDOM.createRoot(wrapper);
+          root.render(
+            <ContentCalculatorUI
+              onClose={() => {
+                uiMounted = false;
+                ui.remove();
+              }}
+              onRemove={ui.remove}
+            />
+          );
+          uiMounted = true;
+          return { root };
+        },
+        onRemove: (elements) => {
+          uiMounted = false;
+          elements?.root.unmount();
+        },
+      });
+      ui.mount();
+    };
 
-    // Also support context menu (legacy)
-    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.type === "SHOW_FLOATING_UI" && !uiMounted) {
-        (async () => {
-          ui = await createShadowRootUi(ctx, {
-            name: "floating-calculator-ui",
-            position: "overlay",
-            onMount: (container) => {
-              const wrapper = document.createElement("div");
-              container.append(wrapper);
-              const root = ReactDOM.createRoot(wrapper);
-              root.render(
-                <ContentCalculatorUI
-                  onClose={() => {
-                    uiMounted = false;
-                    ui.remove();
-                  }}
-                  onRemove={ui.remove}
-                />
-              );
-              uiMounted = true;
-              return { root };
-            },
-            onRemove: (elements) => {
-              uiMounted = false;
-              elements?.root.unmount();
-            },
-          });
-          ui.mount();
-        })();
-        sendResponse({ message: "SHOW_FLOATING_UI message received!" });
+    // Single message listener for both message types
+    browser.runtime.onMessage.addListener((message) => {
+      if (
+        (message.type === "MOUNT_UI" || message.type === "SHOW_FLOATING_UI") &&
+        !uiMounted
+      ) {
+        mountCalculatorUI();
       }
     });
 
