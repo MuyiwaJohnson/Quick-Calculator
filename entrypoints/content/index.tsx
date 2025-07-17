@@ -1,4 +1,3 @@
-// content.js
 import ReactDOM from "react-dom/client";
 import { createShadowRootUi } from "#imports";
 import ContentCalculatorUI from "./components/ContentCalculatorUI.tsx";
@@ -26,7 +25,10 @@ export default defineContentScript({
       name: "floating-calculator-ui",
       position: "overlay",
       onMount: (container) => {
-        const root = ReactDOM.createRoot(container);
+        const wrapper = document.createElement("div");
+        container.append(wrapper);
+
+        const root = ReactDOM.createRoot(wrapper);
         root.render(
           <ContentCalculatorUI
             onClose={() => {
