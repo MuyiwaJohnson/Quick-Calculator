@@ -4,7 +4,7 @@
  * Supports commas, decimals, and negatives (no currency).
  */
 export function isNumberLike(text: string): boolean {
-  if (!text || typeof text !== 'string') return false;
+  if (!text || typeof text !== "string") return false;
   const cleaned = text.replace(/[\s,]/g, "");
   return /^-?\d+(\.\d+)?$/.test(cleaned);
 }
@@ -27,7 +27,7 @@ export function extractNumber(text: string): number | null {
 export function formatLargeNumber(num: number): string {
   const sign = num < 0 ? "-" : "";
   const absNum = Math.abs(num);
-  
+
   if (absNum >= 1e12) {
     return `${sign}${(absNum / 1e12).toFixed(2)}T`;
   } else if (absNum >= 1e9) {
@@ -51,7 +51,11 @@ export function isNumberTooLarge(num: number): boolean {
 /**
  * Check for mathematical overflow
  */
-export function checkOverflow(a: number, b: number, operation: string): boolean {
+export function checkOverflow(
+  a: number,
+  b: number,
+  operation: string
+): boolean {
   switch (operation) {
     case "×":
       return Math.abs(a) > Number.MAX_SAFE_INTEGER / Math.abs(b);
@@ -79,25 +83,28 @@ export function getNumberFontSize(num: number): string {
 /**
  * Format number for display with proper decimal handling
  */
-export function formatNumberForDisplay(num: number, maxDecimals: number = 2): string {
+export function formatNumberForDisplay(
+  num: number,
+  maxDecimals: number = 2
+): string {
   // Handle very small decimals
   if (Math.abs(num) < 0.01 && num !== 0) {
     return num.toExponential(2);
   }
-  
+
   // Handle integers
   if (Number.isInteger(num)) {
     return num.toLocaleString();
   }
-  
+
   // Handle decimals with proper formatting
-  const formatted = num.toLocaleString('en-US', {
+  const formatted = num.toLocaleString("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: maxDecimals,
   });
-  
+
   return formatted;
-} 
+}
 
 // Returns the color for a calculator operation symbol
 export function opColor(op: string): string {
@@ -118,6 +125,8 @@ export function opColor(op: string): string {
 }
 
 // Type guard for MotionValue<number>
-export function isMotionValue(val: any): val is import("motion/react").MotionValue<number> {
+export function isMotionValue(
+  val: any
+): val is import("motion/react").MotionValue<number> {
   return val && typeof val.on === "function" && typeof val.get === "function";
-} 
+}

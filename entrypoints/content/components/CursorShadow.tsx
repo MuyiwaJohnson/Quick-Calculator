@@ -188,6 +188,8 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
           };
       return (
         <motion.div
+          data-calculator-ui
+          id="calculator-ui"
           style={fixedStyle}
           className="min-w-[288px] max-w-[360px] min-h-[276px] max-h-[346px] bg-[rgba(20,20,20,0.98)] text-white rounded-2xl shadow-2xl p-6 pt-3 border border-[#444] backdrop-blur-md z-[9999]"
           initial={{

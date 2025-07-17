@@ -3,45 +3,23 @@ import ReactDOM from "react-dom/client";
 import { createShadowRootUi } from "#imports";
 import ContentCalculatorUI from "./components/ContentCalculatorUI.tsx";
 import "../popup/style.css";
+import { addDoubleClickNumberListener } from "./utils/dbl-click-num-listener.ts";
 
 export default defineContentScript({
   matches: ["*://*/*"],
   cssInjectionMode: "ui",
   async main(ctx) {
-    console.log("Floating UI content script loaded");
-    
-    let mousePosition = { x: 0, y: 0 };
     let uiMounted = false;
     let ui: any;
 
-    // Track mouse position globally
-    const handleMouseMove = (e: MouseEvent) => {
-      mousePosition = { x: e.clientX, y: e.clientY };
-      
-      // Dispatch custom event for UI to listen
-      if (uiMounted) {
-        window.dispatchEvent(new CustomEvent('mousePositionUpdate', {
-          detail: { x: e.clientX, y: e.clientY }
-        }));
-      }
-    };
-
-    // Handle double-click on numbers
-    const handleDoubleClick = (e: MouseEvent) => {
-      const selection = window.getSelection();
-      const selectedText = selection ? selection.toString() : "";
-      const number = parseFloat(selectedText);
-      
-      if (!isNaN(number) && selectedText.trim() !== '') {
-        window.dispatchEvent(new CustomEvent('numberDoubleClick', {
-          detail: { number, position: { x: e.clientX, y: e.clientY } }
-        }));
-      }
-    };
-
-    // Add event listeners
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('dblclick', handleDoubleClick);
+    // Add double-click number listener
+    const removeDoubleClickListener = addDoubleClickNumberListener((number, position) => {
+      window.dispatchEvent(
+        new CustomEvent("numberDoubleClick", {
+          detail: { number, position },
+        })
+      );
+    });
 
     // Create shadow root UI
     ui = await createShadowRootUi(ctx, {
@@ -50,8 +28,7 @@ export default defineContentScript({
       onMount: (container) => {
         const root = ReactDOM.createRoot(container);
         root.render(
-          <ContentCalculatorUI 
-            initialPosition={mousePosition}
+          <ContentCalculatorUI
             onClose={() => {
               uiMounted = false;
               ui.remove();
@@ -70,8 +47,7 @@ export default defineContentScript({
 
     // Listen for context menu messages
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.type === 'SHOW_FLOATING_UI') {
-        mousePosition = message.position;
+      if (message.type === "SHOW_FLOATING_UI") {
         ui.mount();
         sendResponse({ message: "SHOW_FLOATING_UI message received!" });
       }
@@ -79,8 +55,7 @@ export default defineContentScript({
 
     // Cleanup on script end
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('dblclick', handleDoubleClick);
+      removeDoubleClickListener();
     };
   },
 });
