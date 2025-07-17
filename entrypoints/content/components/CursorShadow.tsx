@@ -164,9 +164,9 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
 
       const totalFontSize = useMemo(() => {
         const abs = Math.abs(total);
-        if (abs >= 1e12) return 16;
-        if (abs >= 1e9) return 20;
-        return 24;
+        if (abs >= 1e12) return 14;
+        if (abs >= 1e9) return 16;
+        return 20;
       }, [total]);
 
       const isTotalTooLarge = useMemo(() => isNumberTooLarge(total), [total]);

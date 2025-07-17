@@ -8,13 +8,13 @@ interface TotalDisplayProps {
 }
 
 export const TotalDisplay: React.FC<TotalDisplayProps> = ({ total, totalFontSize, isTotalTooLarge }) => (
-  <div className="flex flex-row items-center justify-between py-[9px] gap-[9px] w-full text-[16.5px]">
-    <span className="text-[#aaa] text-[16.5px] font-medium whitespace-nowrap flex-shrink-0">
+  <div className="flex flex-row items-center justify-between py-[9px] gap-[9px] w-full text-[16px]">
+    <span className="text-[#aaa] text-[16px] font-medium whitespace-nowrap flex-shrink-0">
       TOTAL
     </span>
     <motion.span
       className="font-bold font-mono text-white break-all overflow-x-auto text-right px-[5px] max-w-[181px]"
-      style={{ fontSize: totalFontSize + 1.5 }}
+      style={{ fontSize: totalFontSize }}
       initial={{ scale: 1.2, color: "#10b981" }}
       animate={{ scale: 1, color: "#ffffff" }}
       transition={{ type: "spring", stiffness: 400, damping: 15 }}

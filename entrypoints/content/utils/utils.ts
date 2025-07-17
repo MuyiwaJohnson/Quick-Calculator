@@ -21,6 +21,19 @@ export function extractNumber(text: string): number | null {
 }
 
 /**
+ * Extracts the first number (with commas/decimals) from a string.
+ * E.g. '17,309,250.00' => 17309250
+ */
+export function extractNumberFromText(text: string): number | null {
+  if (!text || typeof text !== 'string') return null;
+  const match = text.match(/-?\d[\d,]*(\.\d+)?/);
+  if (!match) return null;
+  const raw = match[0].replace(/,/g, '');
+  const value = parseFloat(raw);
+  return isNaN(value) ? null : value;
+}
+
+/**
  * Format large numbers with abbreviations (K, M, B, T)
  * Enhanced to handle decimals and negatives
  */
@@ -116,7 +129,7 @@ export function opColor(op: string): string {
     case "×":
       return "#3b82f6";
     case "÷":
-      return "#a21caf";
+      return "#a21caf"; 
     case "%":
       return "#f59e42";
     default:
