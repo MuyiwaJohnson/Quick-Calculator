@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
 import { useCalculator } from "../hooks/use-calculator";
 import { useToast, ToastContainer } from "../hooks/use-toast";
@@ -10,15 +10,14 @@ interface ContentCalculatorUIProps {
   onRemove?: () => void;
 }
 
-// center of the screen
-const initialPosition = { x: 200, y: 100 };
+// Constants
+const INITIAL_POSITION = { x: 200, y: 100 };
+const SPRING_CONFIG = { stiffness: 300, damping: 30 };
 
-const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
-  onRemove,
-}) => {
+const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({ onRemove }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [followMouse, setFollowMouse] = useState(false);
-  const [mousePosition, setMousePosition] = useState(initialPosition);
+  const [mousePosition, setMousePosition] = useState(INITIAL_POSITION);
 
   // Calculator state
   const {
@@ -36,37 +35,70 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
     editHistoryItem,
   } = useCalculator();
 
+  const { toasts, showToast, removeToast } = useToast();
+
+  // Motion values for position
+  const x = useMotionValue(INITIAL_POSITION.x);
+  const y = useMotionValue(INITIAL_POSITION.y);
+  const springX = useSpring(x, SPRING_CONFIG);
+  const springY = useSpring(y, SPRING_CONFIG);
+
   // Set calculator visible when UI is mounted
   useEffect(() => {
     setVisibility(true);
   }, [setVisibility]);
 
-  const { toasts, showToast, removeToast } = useToast();
+  // Show visual feedback when number is added
+  const showNumberAddedFeedback = useCallback((position: any, number: any) => {
+    const feedback = document.createElement("div");
+    feedback.textContent = `+${number}`;
+    
+    Object.assign(feedback.style, {
+      position: "fixed",
+      left: `${position.x}px`,
+      top: `${position.y}px`,
+      color: opColor(currentOperation),
+      fontWeight: "bold",
+      fontSize: "14px",
+      pointerEvents: "none",
+      zIndex: "10001",
+      animation: "fadeUpAndOut 1s ease-out forwards",
+    });
 
-  // Motion values for position
-  const x = useMotionValue(initialPosition.x);
-  const y = useMotionValue(initialPosition.y);
-  const springX = useSpring(x, { stiffness: 300, damping: 30 });
-  const springY = useSpring(y, { stiffness: 300, damping: 30 });
+    // Add styles if not already present
+    if (!document.getElementById("number-feedback-styles")) {
+      const style = document.createElement("style");
+      style.id = "number-feedback-styles";
+      style.textContent = `
+        @keyframes fadeUpAndOut {
+          0% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-20px); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
 
+    document.body.appendChild(feedback);
+    setTimeout(() => feedback.remove(), 1000);
+  }, [currentOperation]);
 
   // Mouse position tracking from extension events
   useEffect(() => {
     const handleMouseMove = (e: any) => {
       const newPosition = { x: e.detail.x, y: e.detail.y };
       setMousePosition(newPosition);
+      
       if (followMouse && !isDragging) {
         x.set(newPosition.x + 20);
         y.set(newPosition.y + 20);
       }
     };
+
     window.addEventListener("mousePositionUpdate", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousePositionUpdate", handleMouseMove);
-    };
+    return () => window.removeEventListener("mousePositionUpdate", handleMouseMove);
   }, [followMouse, isDragging, x, y]);
 
-  // Double-click number capture (only when visible)
+  // Double-click number capture
   useEffect(() => {
     const handleNumberDoubleClick = (e: any) => {
       const { number, position } = e.detail;
@@ -74,36 +106,12 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
       showNumberAddedFeedback(position, number);
       showToast(`Added ${number}`, "success");
     };
+
     window.addEventListener("numberDoubleClick", handleNumberDoubleClick);
-    return () => {
-      window.removeEventListener("numberDoubleClick", handleNumberDoubleClick);
-    };
-  }, [addNumber, showToast]);
+    return () => window.removeEventListener("numberDoubleClick", handleNumberDoubleClick);
+  }, [addNumber, showToast, showNumberAddedFeedback]);
 
-  // Show visual feedback when number is added
-  const showNumberAddedFeedback = (position: any, number: any) => {
-    const feedback = document.createElement("div");
-    feedback.textContent = `+${number}`;
-    feedback.style.position = "fixed";
-    feedback.style.left = `${position.x}px`;
-    feedback.style.top = `${position.y}px`;
-    feedback.style.color = opColor(currentOperation);
-    feedback.style.fontWeight = "bold";
-    feedback.style.fontSize = "14px";
-    feedback.style.pointerEvents = "none";
-    feedback.style.zIndex = "10001";
-    feedback.style.animation = "fadeUpAndOut 1s ease-out forwards";
-    if (!document.getElementById("number-feedback-styles")) {
-      const style = document.createElement("style");
-      style.id = "number-feedback-styles";
-      style.textContent = `@keyframes fadeUpAndOut {0% { opacity: 1; transform: translateY(0); }100% { opacity: 0; transform: translateY(-20px); }}`;
-      document.head.appendChild(style);
-    }
-    document.body.appendChild(feedback);
-    setTimeout(() => feedback.remove(), 1000);
-  };
-
-  // Keyboard shortcuts (only when visible)
+  // Keyboard shortcuts
   useKeyboardShortcuts({
     onUndo: undo,
     onReset: reset,
