@@ -4,15 +4,15 @@ export default defineBackground(() => {
   // Context menu setup
   browser.runtime.onInstalled.addListener(() => {
     browser.contextMenus.create({
-      id: "open-cursor-mate",
-      title: "Cursor Mate",
+      id: "quick-calculator",
+      title: "Quick Calculator",
       contexts: ["all"],
     });
   });
 
   // Context menu click handler
   browser.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === "open-cursor-mate" && tab?.id) {
+    if (info.menuItemId === "quick-calculator" && tab?.id) {
       browser.tabs.sendMessage(
         tab.id,
         { type: "SHOW_FLOATING_UI" }
