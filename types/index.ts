@@ -37,6 +37,7 @@ export interface UseCalculatorReturn {
   reset: () => void;
   undo: () => void;
   copyTotal: () => Promise<void>;
+  setVisibility: (visible: boolean) => void;
 }
 
 // For use-cursor-pos, adapt as needed for your implementation

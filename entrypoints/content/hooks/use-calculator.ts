@@ -108,6 +108,13 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
   }, [config.defaultOperation]);
 
   /**
+   * Sets the calculator visibility.
+   */
+  const setVisibility = useCallback((visible: boolean) => {
+    setIsCalculatorVisible(visible);
+  }, []);
+
+  /**
    * Undoes the last operation in the history.
    */
   const undo = useCallback(() => {
@@ -170,5 +177,6 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
     reset,
     undo,
     copyTotal,
+    setVisibility,
   };
 }; 

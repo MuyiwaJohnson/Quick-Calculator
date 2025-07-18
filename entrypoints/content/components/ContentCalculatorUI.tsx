@@ -5,6 +5,7 @@ import { useToast, ToastContainer } from "../hooks/use-toast";
 import { useKeyboardShortcuts } from "../hooks/use-keyboard-shortcuts";
 import type { CalculatorOperation } from "../../../types";
 import { CursorShadow } from "./CursorShadow";
+import { opColor } from "../utils/utils";
 
 interface ContentCalculatorUIProps {
   initialPosition?: { x: number; y: number };
@@ -33,7 +34,13 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
     undo,
     copyTotal,
     isCalculatorVisible,
+    setVisibility,
   } = useCalculator();
+
+  // Set calculator visible when UI is mounted
+  useEffect(() => {
+    setVisibility(true);
+  }, [setVisibility]);
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -81,7 +88,7 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
     feedback.style.position = "fixed";
     feedback.style.left = `${position.x}px`;
     feedback.style.top = `${position.y}px`;
-    feedback.style.color = "#10b981";
+    feedback.style.color = opColor(currentOperation);
     feedback.style.fontWeight = "bold";
     feedback.style.fontSize = "14px";
     feedback.style.pointerEvents = "none";
@@ -118,7 +125,7 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
           y={followMouse ? springY : y}
           total={total}
           history={history}
-          isVisible={true}
+          isVisible={isCalculatorVisible}
           onOperation={setOperation}
           currentOperation={currentOperation}
           onCopy={copyTotal}
