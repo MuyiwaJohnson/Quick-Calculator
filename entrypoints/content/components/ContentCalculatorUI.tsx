@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { motion, useMotionValue, useSpring } from "motion/react";
 import { useCalculator } from "../hooks/use-calculator";
 import { useToast, ToastContainer } from "../hooks/use-toast";
 import { useKeyboardShortcuts } from "../hooks/use-keyboard-shortcuts";
-import type { CalculatorOperation } from "../../../types";
 import { CursorShadow } from "./CursorShadow";
 import { opColor } from "../utils/utils";
 
