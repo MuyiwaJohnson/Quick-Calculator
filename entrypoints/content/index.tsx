@@ -30,6 +30,11 @@ export default defineContentScript({
         position: "overlay",
         onMount: (container) => {
           const wrapper = document.createElement("div");
+          wrapper.style.backgroundColor = "rgba(20,20,20,0.98)";
+          wrapper.style.borderRadius = "16px";
+          wrapper.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+          wrapper.style.border = "1px solid #444";
+
           container.append(wrapper);
           const root = ReactDOM.createRoot(wrapper);
           root.render(

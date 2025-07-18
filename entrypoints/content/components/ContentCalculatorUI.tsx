@@ -111,6 +111,7 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
         dragMomentum={false}
         style={{ x, y, position: "fixed", zIndex: 10000 }}
         id="calculator-ui"
+        className="rounded-2xl shadow-2xl border border-[#444] bg-[rgba(20,20,20,0.98)]"
       >
         <CursorShadow
           x={followMouse ? springX : x}

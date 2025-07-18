@@ -7,8 +7,8 @@ export default defineConfig({
     plugins: [tailwindcss()],
   }),
   manifest: {
-    name: 'Cursor Simple Calc',
-    description: 'A simple, animated calculator extension with cursor shadow and context menu integration.',
+    name: 'QuickCalc',
+    description: 'Just double-click a number, and its done.',
     permissions: ['clipboardWrite', 'contextMenus', 'storage'],
     icons: {
       '16': 'icon/16.png',
@@ -16,6 +16,7 @@ export default defineConfig({
       '48': 'icon/48.png',
       '128': 'icon/128.png',
     },
+    version: '1.0.0',
     action: {},
   },
 });
