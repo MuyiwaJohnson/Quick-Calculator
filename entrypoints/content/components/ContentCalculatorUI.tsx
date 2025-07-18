@@ -11,7 +11,7 @@ interface ContentCalculatorUIProps {
 }
 
 // center of the screen
-const initialPosition = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+const initialPosition = { x: 200, y: 100 };
 
 const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
   onRemove,
