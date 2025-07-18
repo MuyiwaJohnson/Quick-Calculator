@@ -4,9 +4,15 @@ import { AnimatePresence, motion } from "motion/react";
 
 interface HistoryListProps {
   history: Array<{ value: number; operation: string; timestamp?: number }>;
+  onDelete?: (index: number) => void;
+  onEdit?: (index: number, newValue: number) => void;
 }
 
-export const HistoryList: React.FC<HistoryListProps> = ({ history }) => {
+export const HistoryList: React.FC<HistoryListProps> = ({ 
+  history, 
+  onDelete, 
+  onEdit 
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,6 +50,8 @@ export const HistoryList: React.FC<HistoryListProps> = ({ history }) => {
                 value={item.value}
                 index={index}
                 timestamp={item.timestamp}
+                onDelete={onDelete}
+                onEdit={onEdit}
               />
             </motion.div>
           ))}

@@ -38,6 +38,9 @@ export interface UseCalculatorReturn {
   undo: () => void;
   copyTotal: () => Promise<void>;
   setVisibility: (visible: boolean) => void;
+  close: () => void;
+  deleteHistoryItem: (index: number) => void;
+  editHistoryItem: (index: number, newValue: number) => void;
 }
 
 // For use-cursor-pos, adapt as needed for your implementation

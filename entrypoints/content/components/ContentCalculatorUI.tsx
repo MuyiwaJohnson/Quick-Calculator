@@ -7,15 +7,12 @@ import { CursorShadow } from "./CursorShadow";
 import { opColor } from "../utils/utils";
 
 interface ContentCalculatorUIProps {
-  initialPosition?: { x: number; y: number };
-  onClose: () => void;
   onRemove?: () => void;
 }
 
 const initialPosition = { x: 100, y: 100 };
 
 const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
-  onClose,
   onRemove,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -34,6 +31,8 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
     copyTotal,
     isCalculatorVisible,
     setVisibility,
+    deleteHistoryItem,
+    editHistoryItem,
   } = useCalculator();
 
   // Set calculator visible when UI is mounted
@@ -131,6 +130,8 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({
           followCursor={followMouse}
           onRemove={onRemove}
           onReset={reset}
+          onDeleteHistoryItem={deleteHistoryItem}
+          onEditHistoryItem={editHistoryItem}
         />
       </motion.div>
       <ToastContainer toasts={toasts} onRemove={removeToast} />

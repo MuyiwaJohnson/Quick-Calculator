@@ -39,11 +39,10 @@ export default defineContentScript({
           const root = ReactDOM.createRoot(wrapper);
           root.render(
             <ContentCalculatorUI
-              onClose={() => {
+              onRemove={() => {
                 uiMounted = false;
                 ui.remove();
               }}
-              onRemove={ui.remove}
             />
           );
           uiMounted = true;

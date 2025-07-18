@@ -50,6 +50,8 @@ interface Props {
   followCursor?: boolean;
   onRemove?: () => void;
   onReset?: () => void;
+  onDeleteHistoryItem?: (index: number) => void;
+  onEditHistoryItem?: (index: number, newValue: number) => void;
 }
 
 export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
@@ -66,6 +68,8 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
       followCursor = true,
       onRemove,
       onReset,
+      onDeleteHistoryItem,
+      onEditHistoryItem,
     }) => {
       const [position, setPosition] = useState({
         top: 0,
@@ -232,7 +236,11 @@ export const CursorShadow: React.FC<Props & { onRemove?: () => void }> =
             currentOperation={currentOperation}
             onOperationClick={handleOperationClick}
           />
-          <HistoryList history={history} />
+          <HistoryList
+            history={history}
+            onDelete={onDeleteHistoryItem}
+            onEdit={onEditHistoryItem}
+          />
           <div className="border-t border-[#444] mb-[13px]"></div>
           <TotalDisplay
             total={total}

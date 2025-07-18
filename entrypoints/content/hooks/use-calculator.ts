@@ -115,6 +115,13 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
   }, []);
 
   /**
+   * Closes the calculator (sets visibility to false).
+   */
+  const close = useCallback(() => {
+    setIsCalculatorVisible(false);
+  }, []);
+
+  /**
    * Undoes the last operation in the history.
    */
   const undo = useCallback(() => {
@@ -167,6 +174,53 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
     }
   }, [total, config.currency]);
 
+  /**
+   * Deletes a history item and recalculates the total.
+   */
+  const deleteHistoryItem = useCallback((index: number) => {
+    if (index >= 0 && index < history.length) {
+      const newHistory = history.filter((_, i) => i !== index);
+      setHistory(newHistory);
+      
+      // Recalculate total from remaining history
+      let newTotal = 0;
+      newHistory.forEach(item => {
+        try {
+          newTotal = calculateResult(item.operation, newTotal, item.value);
+        } catch (error) {
+          console.error('Error recalculating total:', error);
+        }
+      });
+      setTotal(newTotal);
+      
+      if (newHistory.length === 0) {
+        setIsCalculatorVisible(false);
+      }
+    }
+  }, [history, calculateResult]);
+
+  /**
+   * Edits a history item and recalculates the total.
+   */
+  const editHistoryItem = useCallback((index: number, newValue: number) => {
+    if (index >= 0 && index < history.length) {
+      const newHistory = [...history];
+      newHistory[index] = { ...newHistory[index], value: newValue };
+      setHistory(newHistory);
+      
+      // Recalculate total from updated history
+      let newTotal = 0;
+      newHistory.forEach(item => {
+        try {
+          newTotal = calculateResult(item.operation, newTotal, item.value);
+        } catch (error) {
+          console.error('Error recalculating total:', error);
+        }
+      });
+      setTotal(newTotal);
+    }
+  }, [history, calculateResult]);
+
   return {
     total,
     history,
@@ -178,5 +232,8 @@ export const useCalculator = (config: CalculatorConfig = {}): UseCalculatorRetur
     undo,
     copyTotal,
     setVisibility,
+    close,
+    deleteHistoryItem,
+    editHistoryItem,
   };
 }; 
