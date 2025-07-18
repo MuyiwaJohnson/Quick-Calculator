@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
   }),
   manifest: {
-    name: 'QuickCalc',
+    name: 'Quick Calculator',
     description: 'Just double-click a number, and its done.',
     permissions: ['clipboardWrite', 'contextMenus', 'storage'],
     icons: {
