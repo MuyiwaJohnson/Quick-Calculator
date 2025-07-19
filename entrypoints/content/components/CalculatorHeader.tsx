@@ -1,24 +1,8 @@
-// CalculatorHeader.tsx
-// Header bar for the calculator popup. Contains drag handle, title, and action buttons (reset, copy, close).
-// Props:
-// - onReset: Resets the calculator (clears history, total, etc.)
-// - onCopy: Copies the total to clipboard
-// - onRemove: Closes the calculator (optional)
-// - hasHistory: Whether there is any history to enable the reset button
-
 import React from "react";
 import { IconButton } from "./IconButton";
 import { Copy, Trash2, X } from "lucide-react";
 
-/**
- * CalculatorHeader
- * Renders the draggable header bar for the calculator, with action buttons.
- * @param {Object} props
- * @param {() => void} props.onReset - Reset the calculator
- * @param {() => void} props.onCopy - Copy the total
- * @param {() => void} [props.onRemove] - Remove/close the calculator
- * @param {boolean} props.hasHistory - Whether there is any history
- */
+
 interface CalculatorHeaderProps {
   onReset: () => void;
   onCopy: () => void;
