@@ -52,8 +52,8 @@ export const CalculatorHeader: React.FC<CalculatorHeaderProps> = ({
         <Copy size={13} />
       </IconButton>
       {onRemove && (
-        <IconButton onClick={onRemove} title="Close calculator" size="large">
-          <X size={13} color="#aaa" />
+        <IconButton onClick={onRemove} title="Close calculator" size="large" color="red">
+          <X size={15} />
         </IconButton>
       )}
     </div>

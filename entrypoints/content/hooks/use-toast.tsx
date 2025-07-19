@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface Toast {
@@ -46,9 +47,9 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
         <div
           key={toast.id}
           className={`px-4 py-2 rounded-lg text-white text-sm shadow-lg backdrop-blur-md border pointer-events-auto
-            ${toast.type === 'success' ? 'bg-green-500/90 border-green-400' : ''}
-            ${toast.type === 'info' ? 'bg-blue-500/90 border-blue-400' : ''}
-            ${toast.type === 'warning' ? 'bg-yellow-500/90 border-yellow-400' : ''}
+            ${toast.type === 'success' ? 'bg-green-600 border-green-500' : ''}
+            ${toast.type === 'info' ? 'bg-blue-600 border-blue-500' : ''}
+            ${toast.type === 'warning' ? 'bg-amber-600 border-amber-500' : ''}
             animate-in slide-in-from-right-2 duration-300`}
           style={{
             position: 'fixed',
@@ -62,9 +63,9 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
             <span>{toast.message}</span>
             <button
               onClick={() => onRemove(toast.id)}
-              className="ml-2 text-white/70 hover:text-white transition-colors"
+              className="ml-2 text-white/80 hover:text-white transition-colors"
             >
-              ×
+              <X size={13} className="text-white/80 hover:text-white" strokeWidth={2} />
             </button>
           </div>
         </div>
