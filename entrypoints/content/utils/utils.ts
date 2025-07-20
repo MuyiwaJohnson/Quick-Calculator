@@ -1,4 +1,21 @@
-// Utility functions ported from cursor-mate
+
+
+
+/**
+ * Check for mathematical overflow for basic operations.
+ * Returns true if the operation would exceed JS safe integer limits.
+ */
+export function checkOverflow(a: number, b: number, operation: string): boolean {
+  switch (operation) {
+    case "×":
+      return Math.abs(a) > Number.MAX_SAFE_INTEGER / Math.abs(b);
+    case "+":
+    case "-":
+      return Math.abs(a) > Number.MAX_SAFE_INTEGER - Math.abs(b);
+    default:
+      return false;
+  }
+} 
 
 /**
  * Extracts the first number (with commas/decimals) from a string.

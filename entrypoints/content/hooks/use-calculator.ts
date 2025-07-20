@@ -1,11 +1,11 @@
 import { useState, useCallback, useMemo, useRef } from "react";
-import { checkOverflow } from "../utils/performance";
 import type {
   CalculatorConfig,
   CalculatorHistory,
   CalculatorOperation,
   UseCalculatorReturn,
 } from "../../../types";
+import { checkOverflow } from "../utils/utils";
 
 export const useCalculator = (
   config: CalculatorConfig = {}
@@ -104,7 +104,10 @@ export const useCalculator = (
         setIsCalculatorVisible(true);
       } catch (error) {
         console.error("Calculator error:", error);
-        throw error;
+        // Set total to error state instead of throwing
+        setTotal(0);
+        // Optionally show error message to user
+        // You could add a toast notification here
       }
     },
     [calculateResult, currentOperation, total, maxHistoryLength]
@@ -135,38 +138,54 @@ export const useCalculator = (
     const lastItem = history[history.length - 1];
     let newTotal = total;
 
-    switch (lastItem.operation) {
-      case "+":
-        newTotal = total - lastItem.value;
-        break;
-      case "-":
-        newTotal = total + lastItem.value;
-        break;
-      case "×":
-        newTotal = total / lastItem.value;
-        break;
-      case "÷":
-        newTotal = total * lastItem.value;
-        break;
-      case "%":
-        newTotal = total / (lastItem.value / 100);
-        break;
-    }
+    try {
+      switch (lastItem.operation) {
+        case "+":
+          newTotal = total - lastItem.value;
+          break;
+        case "-":
+          newTotal = total + lastItem.value;
+          break;
+        case "×":
+          if (lastItem.value === 0) {
+            console.error("Cannot undo multiplication by zero");
+            return;
+          }
+          newTotal = total / lastItem.value;
+          break;
+        case "÷":
+          newTotal = total * lastItem.value;
+          break;
+        case "%":
+          if (lastItem.value === 0) {
+            console.error("Cannot undo percentage calculation with zero");
+            return;
+          }
+          newTotal = total / (lastItem.value / 100);
+          break;
+      }
 
-    // Batch state updates
-    setTotal(newTotal);
-    setHistory((prev) => prev.slice(0, -1));
+      // Check if result is valid
+      if (!isFinite(newTotal)) {
+        console.error("Undo operation resulted in invalid number");
+        return;
+      }
 
-    if (history.length === 1) {
-      setIsCalculatorVisible(false);
+      // Batch state updates
+      setTotal(newTotal);
+      setHistory((prev) => prev.slice(0, -1));
+
+      if (history.length === 1) {
+        setIsCalculatorVisible(false);
+      }
+    } catch (error) {
+      console.error("Error during undo operation:", error);
+      // Don't update state if there's an error
     }
   }, [history, total]);
 
   const copyTotal = useCallback(async () => {
-    const formattedTotal = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency === "₦" ? "NGN" : "USD",
-    }).format(total);
+    const formattedTotal = total.toString();
 
     try {
       await navigator.clipboard.writeText(formattedTotal);
@@ -181,7 +200,7 @@ export const useCalculator = (
       document.execCommand("copy");
       document.body.removeChild(textArea);
     }
-  }, [total, currency]);
+  }, [total]);
 
   const recalculateTotal = useCallback(
     (historyArray: CalculatorHistory[]) => {
@@ -191,7 +210,8 @@ export const useCalculator = (
           newTotal = calculateResult(item.operation, newTotal, item.value);
         } catch (error) {
           console.error("Error recalculating total:", error);
-          break;
+          // Return a safe default value instead of breaking
+          return 0;
         }
       }
       return newTotal;
@@ -206,12 +226,19 @@ export const useCalculator = (
       const newHistory = history.filter((_, i) => i !== index);
       const newTotal = recalculateTotal(newHistory);
 
-      // Batch state updates
-      setHistory(newHistory);
-      setTotal(newTotal);
+      // Ensure we have a valid total
+      if (isFinite(newTotal)) {
+        // Batch state updates
+        setHistory(newHistory);
+        setTotal(newTotal);
 
-      if (newHistory.length === 0) {
-        setIsCalculatorVisible(false);
+        if (newHistory.length === 0) {
+          setIsCalculatorVisible(false);
+        }
+      } else {
+        console.error("Invalid total after deleting history item, resetting to 0");
+        setHistory(newHistory);
+        setTotal(0);
       }
     },
     [history, recalculateTotal]
@@ -225,9 +252,16 @@ export const useCalculator = (
       newHistory[index] = { ...newHistory[index], value: newValue };
       const newTotal = recalculateTotal(newHistory);
 
-      // Batch state updates
-      setHistory(newHistory);
-      setTotal(newTotal);
+      // Ensure we have a valid total
+      if (isFinite(newTotal)) {
+        // Batch state updates
+        setHistory(newHistory);
+        setTotal(newTotal);
+      } else {
+        console.error("Invalid total after editing history item, resetting to 0");
+        setHistory(newHistory);
+        setTotal(0);
+      }
     },
     [history, recalculateTotal]
   );

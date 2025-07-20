@@ -1,6 +1,4 @@
-// Types ported from cursor-mate
 
-// Core Types
 export type CalculatorOperation = '+' | '-' | '×' | '÷' | '%';
 export type ToastType = 'success' | 'info' | 'warning';
 
@@ -43,9 +41,8 @@ export interface UseCalculatorReturn {
   editHistoryItem: (index: number, newValue: number) => void;
 }
 
-// For use-cursor-pos, adapt as needed for your implementation
 export interface UseCursorPositionReturn {
-  x: any; // Replace with correct type if using motion/react
+  x: any; 
   y: any;
 }
 
