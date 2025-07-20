@@ -57,12 +57,13 @@ export default defineContentScript({
     };
 
     // Single message listener for both message types
-    browser.runtime.onMessage.addListener((message) => {
+    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (
         (message.type === "MOUNT_UI" || message.type === "SHOW_FLOATING_UI") &&
         !uiMounted
       ) {
         mountCalculatorUI();
+        sendResponse({});
       }
     });
 

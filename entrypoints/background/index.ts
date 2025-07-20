@@ -15,8 +15,11 @@ export default defineBackground(() => {
     if (info.menuItemId === "quick-calculator" && tab?.id) {
       browser.tabs.sendMessage(
         tab.id,
-        { type: "SHOW_FLOATING_UI" }
+        { type: "SHOW_FLOATING_UI" },
+        (response) => {
+        }
       );
+
     }
   });
 
@@ -24,7 +27,8 @@ export default defineBackground(() => {
   (browser.action ?? browser.browserAction).onClicked.addListener(
     async (tab) => {
       if (tab.id) {
-        await browser.tabs.sendMessage(tab.id, { type: "MOUNT_UI" });
+         browser.tabs.sendMessage(tab.id, { type: "MOUNT_UI" }, (response) => {
+        });
       }
     }
   );
