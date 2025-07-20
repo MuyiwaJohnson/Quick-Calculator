@@ -24,10 +24,13 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({ onRemove }) =
     total,
     history,
     currentOperation,
+    canUndo,
+    canRedo,
     addNumber,
     setOperation,
     reset,
     undo,
+    redo,
     copyTotal,
     isCalculatorVisible,
     setVisibility,
@@ -114,6 +117,7 @@ const ContentCalculatorUI: React.FC<ContentCalculatorUIProps> = ({ onRemove }) =
   // Keyboard shortcuts
   useKeyboardShortcuts({
     onUndo: undo,
+    onRedo: redo,
     onReset: reset,
     isEnabled: isCalculatorVisible,
   });

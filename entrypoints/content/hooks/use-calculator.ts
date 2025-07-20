@@ -16,6 +16,8 @@ export const useCalculator = (
   const [currentOperation, setCurrentOperation] = useState<CalculatorOperation>(
     config.defaultOperation || "+"
   );
+  const [undoStack, setUndoStack] = useState<CalculatorHistory[]>([]);
+  const [redoStack, setRedoStack] = useState<CalculatorHistory[]>([]);
 
   // Use refs for config values to avoid recreating callbacks when config changes
   const configRef = useRef(config);
@@ -92,6 +94,12 @@ export const useCalculator = (
           timestamp: Date.now(),
         };
 
+        // Clear redo stack when new operation is performed
+        setRedoStack([]);
+
+        // Add to undo stack for redo functionality
+        setUndoStack(prev => [...prev, newHistoryItem]);
+
         // Batch state updates
         setTotal(newTotal);
         setHistory((prev) => {
@@ -133,9 +141,9 @@ export const useCalculator = (
   }, []);
 
   const undo = useCallback(() => {
-    if (history.length === 0) return;
+    if (undoStack.length === 0) return;
 
-    const lastItem = history[history.length - 1];
+    const lastItem = undoStack[undoStack.length - 1];
     let newTotal = total;
 
     try {
@@ -171,18 +179,21 @@ export const useCalculator = (
         return;
       }
 
-      // Batch state updates
+      // Move item from undo to redo stack
+      setUndoStack(prev => prev.slice(0, -1));
+      setRedoStack(prev => [...prev, lastItem]);
+
+      // Update state
       setTotal(newTotal);
-      setHistory((prev) => prev.slice(0, -1));
+      setHistory(prev => prev.slice(0, -1));
 
       if (history.length === 1) {
         setIsCalculatorVisible(false);
       }
     } catch (error) {
       console.error("Error during undo operation:", error);
-      // Don't update state if there's an error
     }
-  }, [history, total]);
+  }, [undoStack, total, history.length]);
 
   const copyTotal = useCallback(async () => {
     const formattedTotal = total.toString();
@@ -266,15 +277,66 @@ export const useCalculator = (
     [history, recalculateTotal]
   );
 
+  // Computed values for undo/redo state
+  const canUndo = useMemo(() => undoStack.length > 0, [undoStack.length]);
+  const canRedo = useMemo(() => redoStack.length > 0, [redoStack.length]);
+
+  // Redo function
+  const redo = useCallback(() => {
+    if (redoStack.length === 0) return;
+
+    const itemToRedo = redoStack[redoStack.length - 1];
+    let newTotal = total;
+
+    try {
+      switch (itemToRedo.operation) {
+        case "+":
+          newTotal = total + itemToRedo.value;
+          break;
+        case "-":
+          newTotal = total - itemToRedo.value;
+          break;
+        case "×":
+          newTotal = total * itemToRedo.value;
+          break;
+        case "÷":
+          if (itemToRedo.value === 0) {
+            console.error("Cannot redo division by zero");
+            return;
+          }
+          newTotal = total / itemToRedo.value;
+          break;
+        case "%":
+          newTotal = (total * itemToRedo.value) / 100;
+          break;
+      }
+
+      if (!isFinite(newTotal)) {
+        console.error("Redo operation resulted in invalid number");
+        return;
+      }
+
+      setTotal(newTotal);
+      setHistory(prev => [...prev, itemToRedo]);
+      setRedoStack(prev => prev.slice(0, -1));
+      setUndoStack(prev => [...prev, itemToRedo]);
+    } catch (error) {
+      console.error("Error during redo operation:", error);
+    }
+  }, [redoStack, total]);
+
   return {
     total,
     history,
     currentOperation,
     isCalculatorVisible,
+    canUndo,
+    canRedo,
     addNumber,
     setOperation,
     reset,
     undo,
+    redo,
     copyTotal,
     setVisibility,
     close,

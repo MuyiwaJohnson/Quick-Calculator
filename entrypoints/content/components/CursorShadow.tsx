@@ -6,6 +6,7 @@ import { CalculatorHeader } from "./CalculatorHeader";
 import { OperationBar } from "./OperationBar";
 import { HistoryList } from "./HistoryList";
 import { TotalDisplay } from "./TotalDisplay";
+import { ShortcutsMarquee } from "./ShortcutsMarquee";
 
 interface Props {
   x: MotionValue<number>;
@@ -201,7 +202,7 @@ export const CursorShadow: React.FC<Props> = React.memo(({
       data-calculator-ui
       id="calculator-ui"
       style={containerStyle}
-      className="min-w-[288px] max-w-[360px] min-h-[276px] max-h-[346px] bg-[rgba(20,20,20,0.98)] text-white rounded-2xl shadow-2xl p-6 pt-3 border border-[#444] backdrop-blur-md z-[9999]"
+      className="min-w-[288px] max-w-[360px] min-h-[276px] max-h-[346px] bg-[rgba(20,20,20,0.98)] text-white rounded-2xl shadow-2xl p-6 pt-3 pb-3 border border-[#444] backdrop-blur-md z-[9999]"
       {...animationProps}
     >
       <CalculatorHeader
@@ -231,13 +232,16 @@ export const CursorShadow: React.FC<Props> = React.memo(({
         isTotalTooLarge={isTotalTooLarge}
       />
       
-      {/* Shortcut Tip Footer */}
+      {/* Shortcut Tip Footer - only show when no history */}
       {history.length === 0 && (
-        <div className="text-[#10b981] text-[13px] text-center opacity-80 mt-[19px] mb-1 flex flex-row items-center justify-center gap-2 select-none">
+        <div className="text-[#10b981] text-[13px] text-center opacity-80 mt-2 mb-1 flex flex-row items-center justify-center gap-2 select-none">
           <span role="img" aria-label="sparkles">✨</span>
           <span className="font-mono">Double-click a number!</span>
         </div>
       )}
+      
+      {/* Shortcuts Marquee*/}
+      <ShortcutsMarquee isVisible={isVisible} />
     </motion.div>
   );
 });

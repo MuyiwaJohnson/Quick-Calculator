@@ -30,10 +30,13 @@ export interface UseCalculatorReturn {
   history: CalculatorHistory[];
   currentOperation: CalculatorOperation;
   isCalculatorVisible: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
   addNumber: (value: number) => void;
   setOperation: (operation: CalculatorOperation) => void;
   reset: () => void;
   undo: () => void;
+  redo: () => void;
   copyTotal: () => Promise<void>;
   setVisibility: (visible: boolean) => void;
   close: () => void;

@@ -2,12 +2,14 @@ import { useEffect, useCallback } from 'react';
 
 interface KeyboardShortcutsProps {
   onUndo: () => void;
+  onRedo: () => void;
   onReset: () => void;
   isEnabled: boolean;
 }
 
 export const useKeyboardShortcuts = ({
   onUndo,
+  onRedo,
   onReset,
   isEnabled,
 }: KeyboardShortcutsProps) => {
@@ -16,9 +18,16 @@ export const useKeyboardShortcuts = ({
       if (!isEnabled) return;
 
       // Ctrl+Z for undo
-      if (event.ctrlKey && event.key === 'z') {
+      if (event.ctrlKey && event.key === 'z' && !event.shiftKey) {
         event.preventDefault();
         onUndo();
+        return;
+      }
+
+      // Ctrl+Y or Ctrl+Shift+Z for redo
+      if ((event.ctrlKey && event.key === 'y') || (event.ctrlKey && event.shiftKey && event.key === 'z')) {
+        event.preventDefault();
+        onRedo();
         return;
       }
 
@@ -29,7 +38,7 @@ export const useKeyboardShortcuts = ({
         return;
       }
     },
-    [isEnabled, onUndo, onReset]
+    [isEnabled, onUndo, onRedo, onReset]
   );
 
   useEffect(() => {
