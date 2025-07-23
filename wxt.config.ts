@@ -9,7 +9,7 @@ export default defineConfig({
   manifest: {
     name: 'Quick Calculator',
     description: 'Just double-click a number, and its done.',
-    permissions: ['clipboardWrite', 'contextMenus', 'storage'],
+    permissions: ['clipboardWrite', 'contextMenus'],
     icons: {
       '16': 'icon/16.png',
       '24': 'icon/24.png',
